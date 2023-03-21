@@ -43,6 +43,8 @@ def add_carrinho(request):
         request.session.save()
 
     x = dict(request.POST)
+    y = request.POST.get('Bordas')
+    print(f'POST AQUI - {y}')
 
     def removeLixo(adicional):
         adicionais = x.copy()
@@ -53,8 +55,9 @@ def add_carrinho(request):
         adicionais = list(adicionais.items())
 
         return adicionais
-        
+    
     adicionais = removeLixo(x)    
+    print(f'ADICIONAIS AQUI - {adicionais}')
 
 
     id = int(x['id'][0])
@@ -102,15 +105,15 @@ def add_carrinho(request):
 
     request.session['carrinho'].append(data)
     request.session.save()
-    #return HttpResponse(request.session['carrinho'])
     return redirect(f'/ver_carrinho')
 
 def ver_carrinho(request):
     categorias = Categoria.objects.all()
-    dados_motrar = []
+    dados_mostrar = []
+    print(request.session['carrinho'][2]['adicionais'][0][1][0])
     for i in request.session['carrinho']:
         prod = Produto.objects.filter(id=i['id_produto'])
-        dados_motrar.append(
+        dados_mostrar.append(
             {'imagem': prod[0].img.url,
              'nome': prod[0].nome_produto,
              'quantidade': i['quantidade'],
@@ -120,7 +123,7 @@ def ver_carrinho(request):
         )
     total = sum([float(i['preco']) for i in request.session['carrinho']])
 
-    return render(request, 'carrinho.html', {'dados': dados_motrar,
+    return render(request, 'carrinho.html', {'dados': dados_mostrar,
                                              'total': total,
                                              'carrinho': len(request.session['carrinho']),
                                              'categorias': categorias,
